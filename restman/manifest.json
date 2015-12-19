@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "RestMan",
+  "name": "Copy RestMan",
   "author": "Joaquin Sargiotto",
-  "description": "RESTMan is a browser extension to work on http requests.",
+  "description": "Copy RESTMan is a browser extension to work on http requests.",
   "version": "0.5",
   "icons": {
     "32": "res/icon32.png",
