@@ -178,5 +178,63 @@ var restman = restman || {};
             });
         },
 
+        _compareCustomMethods: function (item, entry) {
+            // Compare method
+            if (item.method != entry.method) {
+                return false;
+            }
+            return true;
+        },
+
+        getAllCustomMethods: function (fn_onsuccess) {
+            return restman.storage.getAll('customMethods', fn_onsuccess);
+        },
+
+        saveCustomMethod: function(methodName, fn_onsuccess) {
+            restman.storage.open(function(dbobject) {
+                // Build request object
+                var entry = {
+                    timestamp: new Date().getTime(),
+                    method: method,
+                };
+
+                restman.storage.getAllCustomMethods(function(items) {
+                    // Check that entry isn't in the history already
+                    for (var i in items) {
+                        var item = items[i];
+                        if (restman.storage._compareCustomMethods(item, entry)) {
+                            //Entry is already in history
+                            return false;
+                        }
+                    }
+                    // Open a transaction for writing
+                    var rw_trans = dbobject.transaction(['customMethods'], 'readwrite');
+                    var store = rw_trans.objectStore('customMethods');
+                    var items = [];
+                    // Save the entry object
+                    store.add(entry);
+                    // Notify callback about success
+                    rw_trans.oncomplete = function (evt) {
+                        fn_onsuccess(entry);
+                    };
+                });
+            });
+        },
+
+        getCustomMethod: function(reqId, fn_onsuccess) {
+            restman.storage.open(function(dbobject) {
+                var r_trans = dbobject.transaction('customMethods', 'readonly');
+                var store = r_trans.objectStore('customMethods');
+                var request = store.get(reqId);
+
+                request.onsuccess = function (successevent) {
+                    var result = request.result;
+                    if (result) {
+                        fn_onsuccess(successevent.target.result);
+                    }
+                }
+            });
+        },
+
     };
 })();
